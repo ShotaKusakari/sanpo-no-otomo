@@ -34,10 +34,10 @@ export default function TopicDisplayPage() {
           今日のお題
         </Typography>
 
-        <Box sx={{ 
-          my: 4, 
-          p: 3, 
-          borderRadius: 2, 
+        <Box sx={{
+          my: 4,
+          p: 3,
+          borderRadius: 2,
           backgroundColor: '#f8f9fa',
           border: '2px solid #e9ecef'
         }}>
@@ -57,12 +57,12 @@ export default function TopicDisplayPage() {
           </Typography>
         </Box>
 
-        <Box sx={{ 
-          display: 'flex', 
+        <Box sx={{
+          display: 'flex',
           gap: 2,
           flexDirection: { xs: 'column', sm: 'row' },
           justifyContent: 'center',
-          mt: 4 
+          mt: 4
         }}>
           <Button
             variant="outlined"
