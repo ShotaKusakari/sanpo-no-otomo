@@ -22,7 +22,7 @@ export default function AuthenticationPage() {
 
   return (
     <Container maxWidth="sm">
-      <Grid container spacing={2} direction="column" alignItems="center" justifyContent="center" style={{ minHeight: '100vh' }}>
+      <Grid container spacing={2} direction="column" alignItems="center" justifyContent="center" style={{ minHeight: '50vh' }}>
         <Grid size={{ xs: 12, sm: 6 }}>
           <TextField
             label="合言葉を入力してください"
