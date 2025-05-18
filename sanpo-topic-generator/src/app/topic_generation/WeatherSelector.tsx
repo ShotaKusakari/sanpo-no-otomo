@@ -1,4 +1,4 @@
-import { Box, ToggleButton, Typography, Grid } from '@mui/material';
+import { Box, ToggleButton, Typography, Grid, CircularProgress } from '@mui/material';
 import { useEffect, useState, useCallback } from 'react';
 import { JSX } from 'react';
 import WbSunnyIcon from '@mui/icons-material/WbSunny';
@@ -25,9 +25,11 @@ const weatherIconMap: { [key: string]: JSX.Element } = {
 
 export default function WeatherSelector({ selectedWeatherId, onWeatherSelect }: WeatherSelectorProps) {
   const [weatherOptions, setWeatherOptions] = useState<Weather[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const requestFetchWeatherData = async () => {
+      setIsLoading(true);
       try {
         const response = await fetch('/api/serverWeatherData');
         const jsonData = await response.json();
@@ -42,6 +44,8 @@ export default function WeatherSelector({ selectedWeatherId, onWeatherSelect }: 
       } catch (error) {
         console.error("Failed to fetch weather data:", error);
         setWeatherOptions([{id: '', name: '天気情報を取得できませんでした'}]);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -69,43 +73,59 @@ export default function WeatherSelector({ selectedWeatherId, onWeatherSelect }: 
       >
         今日の天気は？
       </Typography>
-      <Grid container spacing={2} justifyContent="center">
-        {weatherOptions.map((option) => (
-          <Grid size={{xs:12, sm:4}} key={option.id}>
-            <ToggleButton
-              value={option.id}
-              selected={selectedWeatherId === option.id}
-              onChange={() => handleWeatherSelect(option.id)}
-              sx={{
-                width: '100%',
-                borderRadius: 4,
-                p: 2,
-                border: '2px solid #e0e0e0',
-                '&.Mui-selected': {
-                  background: 'linear-gradient(45deg, #4CAF50 30%, #81C784 90%)',
-                  color: 'white',
-                },
-                '&:hover': {
-                  background: '#f5f5f5',
-                }
-              }}
-            >
-            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
-              {weatherIconMap[option.id] || null}
-              <Typography sx={{
-                fontSize: {
-                  xs: '0.9rem',
-                  sm: '1rem',
-                  md: '1.1rem'
-                }
-              }}>
-                {option.name}
-              </Typography>
-            </Box>
-            </ToggleButton>
-          </Grid>
-        ))}
-      </Grid>
+      {isLoading ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+          <CircularProgress />
+        </Box>
+      ) : (
+        <Grid container spacing={2} justifyContent="center">
+          {weatherOptions.map((option) => (
+            <Grid size={{xs:12, sm:4}} key={option.id}>
+              <ToggleButton
+                value={option.id}
+                selected={selectedWeatherId === option.id}
+                onChange={() => handleWeatherSelect(option.id)}
+                disabled={isLoading}
+                sx={{
+                  width: '100%',
+                  borderRadius: 4,
+                  p: 2,
+                  border: '2px solid #e0e0e0',
+                  '&.Mui-selected': {
+                    background: 'linear-gradient(45deg, #4CAF50 30%, #81C784 90%) !important',
+                    color: 'white !important',
+                  },
+                  '&:hover': {
+                    background: '#f5f5f5',
+                  },
+                  '@media (hover: none)': {
+                    '&.Mui-selected': {
+                      background: 'linear-gradient(45deg, #4CAF50 30%, #81C784 90%) !important',
+                      color: 'white !important',
+                    },
+                    '&:hover': {
+                      background: 'none',
+                    }
+                  }
+                }}
+              >
+              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
+                {weatherIconMap[option.id] || null}
+                <Typography sx={{
+                  fontSize: {
+                    xs: '0.9rem',
+                    sm: '1rem',
+                    md: '1.1rem'
+                  }
+                }}>
+                  {option.name}
+                </Typography>
+              </Box>
+              </ToggleButton>
+            </Grid>
+          ))}
+        </Grid>
+      )}
     </Box>
   );
 }
