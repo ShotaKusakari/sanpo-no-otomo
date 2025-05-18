@@ -3,7 +3,7 @@ import { Box, Button, Container, Paper, Typography, Alert, Snackbar } from "@mui
 import WeatherSelector from "./WeatherSelector";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { fetchTopicData } from "@/app/api/topic/route";
+import { fetchTopicData } from "@/app/api/topic/topics";
 
 export default function TopicGenerationPage() {
     const [selectedWeatherId, setSelectedWeather] = useState<string>('');

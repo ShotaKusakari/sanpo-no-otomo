@@ -4,7 +4,7 @@ import { JSX } from 'react';
 import WbSunnyIcon from '@mui/icons-material/WbSunny';
 import CloudIcon from '@mui/icons-material/Cloud';
 import UmbrellaIcon from '@mui/icons-material/Umbrella';
-import { fetchWeatherData } from '@/app/api/WeatherData/route';
+import { fetchWeatherData } from '@/app/api/WeatherData/weatherDatas';
 import { Database } from '@/../database.types';
 
 type Weather = Database['public']['Tables']['weather_types']['Row'];
