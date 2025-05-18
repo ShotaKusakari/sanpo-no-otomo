@@ -41,7 +41,7 @@ export default function WeatherSelector({ selectedWeatherId, onWeatherSelect }: 
         setWeatherOptions(jsonData);
       } catch (error) {
         console.error("Failed to fetch weather data:", error);
-        setWeatherOptions([]);
+        setWeatherOptions([{id: '', name: '天気情報を取得できませんでした'}]);
       }
     };
 
@@ -85,7 +85,7 @@ export default function WeatherSelector({ selectedWeatherId, onWeatherSelect }: 
                   background: 'linear-gradient(45deg, #4CAF50 30%, #81C784 90%)',
                   color: 'white',
                 },
-                '&amp:hover': {
+                '&:hover': {
                   background: '#f5f5f5',
                 }
               }}
