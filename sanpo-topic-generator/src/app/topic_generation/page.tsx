@@ -1,16 +1,47 @@
 "use client";
-import { Box, Button, Container, Paper, Typography } from "@mui/material";
+import { Box, Button, Container, Paper, Typography, Alert, Snackbar } from "@mui/material";
 import WeatherSelector from "./WeatherSelector";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { fetchTopicData } from "@/app/api/topic/route";
 
 export default function TopicGenerationPage() {
-    const [selectedWeather, setSelectedWeather] = useState<string>("");
+    const [selectedWeatherId, setSelectedWeather] = useState<string>('');
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [error, setError] = useState<string | null>(null);
     const router = useRouter();
 
-    const handleGenerateTopic = () => {
-        router.push("/topic_generation/topic_display");
-    }
+    const handleGenerateTopic = async () => {
+        if (!selectedWeatherId) {
+            setError('天気を選択してください');
+            return;
+        }
+
+        setIsLoading(true);
+        setError(null);
+
+        try {
+            const response = await fetchTopicData(selectedWeatherId);
+            const data = await response.json();
+
+            if (data.error) {
+                throw new Error(data.error);
+            }
+
+            if (!data.title) {
+                throw new Error('お題の取得に失敗しました');
+            }
+
+            sessionStorage.setItem('topicTitle', data.title);
+            router.push("/topic_generation/topic_display");
+        } catch (error) {
+            const message = error instanceof Error ? error.message : 'お題の生成に失敗しました';
+            console.error("Failed to fetch topic:", error);
+            setError(message);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     return (
         <Container maxWidth="sm" sx={{ mt: 4 }}>
@@ -42,7 +73,7 @@ export default function TopicGenerationPage() {
                 </Typography>
 
                 <WeatherSelector
-                    selectedWeather={selectedWeather}
+                    selectedWeatherId={selectedWeatherId}
                     onWeatherSelect={setSelectedWeather}
                 />
 
@@ -66,11 +97,26 @@ export default function TopicGenerationPage() {
                             }
                         }}
                         onClick={handleGenerateTopic}
-          >
-                    お題を生成する
-                </Button>
-            </Box>
-        </Paper>
-    </Container >
-  );
+                        disabled={isLoading}
+                    >
+                        {isLoading ? '生成中...' : 'お題を生成する'}
+                    </Button>
+                </Box>
+            </Paper>
+            <Snackbar
+                open={!!error}
+                autoHideDuration={6000}
+                onClose={() => setError(null)}
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+            >
+                <Alert
+                    onClose={() => setError(null)}
+                    severity="error"
+                    sx={{ width: '100%' }}
+                >
+                    {error}
+                </Alert>
+            </Snackbar>
+        </Container >
+    );
 }
