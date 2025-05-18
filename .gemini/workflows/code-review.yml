@@ -34,6 +34,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: truongnh1992/gemini-ai-code-reviewer@main
+        env:
+          LANG: ja_JP.UTF-8
+          LANGUAGE: ja_JP:ja
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}

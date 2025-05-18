@@ -1,19 +1,56 @@
 import { Box, ToggleButton, Typography, Grid } from '@mui/material';
+import { useEffect, useState, useCallback } from 'react';
+import { JSX } from 'react';
 import WbSunnyIcon from '@mui/icons-material/WbSunny';
 import CloudIcon from '@mui/icons-material/Cloud';
 import UmbrellaIcon from '@mui/icons-material/Umbrella';
+import { Database } from '@/../database.types';
+
+type Weather = Database['public']['Tables']['weather_types']['Row'];
 
 interface WeatherSelectorProps {
-  selectedWeather: string;
+  selectedWeatherId: string;
   onWeatherSelect: (weather: string) => void;
 }
 
-export default function WeatherSelector({ selectedWeather, onWeatherSelect }: WeatherSelectorProps) {
-  const weatherOptions = [
-    { value: 'sunny', label: '晴れ', icon: <WbSunnyIcon /> },
-    { value: 'cloudy', label: '曇り', icon: <CloudIcon /> },
-    { value: 'rainy', label: '雨', icon: <UmbrellaIcon /> },
-  ];
+const SUNNY_ID = 'cc7a0a0d-f3e1-0b59-9f8d-7674ff94ed54';
+const CLOUDY_ID = '0f742b2e-e147-ba50-bb44-a42bd083b64e';
+const RAIN_ID = 'b47687ca-3bda-2e2f-e1a8-135d9f3d77c6';
+
+const weatherIconMap: { [key: string]: JSX.Element } = {
+  [SUNNY_ID]: <WbSunnyIcon />,
+  [CLOUDY_ID]: <CloudIcon />,
+  [RAIN_ID]: <UmbrellaIcon />,
+};
+
+export default function WeatherSelector({ selectedWeatherId, onWeatherSelect }: WeatherSelectorProps) {
+  const [weatherOptions, setWeatherOptions] = useState<Weather[]>([]);
+
+  useEffect(() => {
+    const requestFetchWeatherData = async () => {
+      try {
+        const response = await fetch('/api/serverWeatherData');
+        const jsonData = await response.json();
+
+        if (jsonData.error) {
+          console.error('API Error:', jsonData.error);
+          setWeatherOptions([]);
+          return;
+        }
+
+        setWeatherOptions(jsonData);
+      } catch (error) {
+        console.error("Failed to fetch weather data:", error);
+        setWeatherOptions([{id: '', name: '天気情報を取得できませんでした'}]);
+      }
+    };
+
+    requestFetchWeatherData();
+  }, []);
+
+  const handleWeatherSelect = useCallback((weatherId: string) => {
+    onWeatherSelect(weatherId);
+  }, [onWeatherSelect]);
 
   return (
     <Box sx={{ textAlign: 'center', width: '100%' }}>
@@ -34,11 +71,11 @@ export default function WeatherSelector({ selectedWeather, onWeatherSelect }: We
       </Typography>
       <Grid container spacing={2} justifyContent="center">
         {weatherOptions.map((option) => (
-          <Grid size={{xs:12, sm:4}} key={option.value}>
+          <Grid size={{xs:12, sm:4}} key={option.id}>
             <ToggleButton
-              value={option.value}
-              selected={selectedWeather === option.value}
-              onChange={() => onWeatherSelect(option.value)}
+              value={option.id}
+              selected={selectedWeatherId === option.id}
+              onChange={() => handleWeatherSelect(option.id)}
               sx={{
                 width: '100%',
                 borderRadius: 4,
@@ -53,18 +90,18 @@ export default function WeatherSelector({ selectedWeather, onWeatherSelect }: We
                 }
               }}
             >
-              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
-                {option.icon}
-                <Typography sx={{
-                  fontSize: {
-                    xs: '0.9rem',
-                    sm: '1rem',
-                    md: '1.1rem'
-                  }
-                }}>
-                  {option.label}
-                </Typography>
-              </Box>
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
+              {weatherIconMap[option.id] || null}
+              <Typography sx={{
+                fontSize: {
+                  xs: '0.9rem',
+                  sm: '1rem',
+                  md: '1.1rem'
+                }
+              }}>
+                {option.name}
+              </Typography>
+            </Box>
             </ToggleButton>
           </Grid>
         ))}

@@ -1,10 +1,13 @@
 import { supabase } from '@/supabase/supabase';
 import { NextResponse } from 'next/server';
-import { Topic } from '@/types';
+import { Database } from '@/../database.types';
 
-export async function POST(request: Request) {
+type Topic = Database['public']['Tables']['topics']['Row'];
+
+export async function GET(request: Request) {
   try {
-    const { weatherId } = await request.json();
+    const { searchParams } = new URL(request.url);
+    const weatherId = searchParams.get('weatherId');
 
     if (!weatherId) {
       return NextResponse.json(
@@ -13,22 +16,21 @@ export async function POST(request: Request) {
       );
     }
 
-    // 天気に紐づくtopic_idをランダムに1件取得
-    const { data: topicWeather, error: topicWeatherError } = await supabase
+    // 天気に紐づくtopic_idを全件取得
+    // TODO: ランダムに1件取得するように変更
+    const { data: topicWeathers, error: topicWeatherError } = await supabase
       .from('topic_weathers')
       .select('topic_id')
-      .eq('weather_id', weatherId)
-      .order('random()')
-      .limit(1)
-      .single();
+      .eq('weather_id', weatherId);
 
-    if (topicWeatherError) {
-      console.error('Error fetching topic_weather:', topicWeatherError);
-      return NextResponse.json(
-        { error: 'Failed to fetch topic' },
-        { status: 500 }
-      );
+    if (topicWeatherError || !topicWeathers || topicWeathers.length === 0) {
+      console.error('Error fetching topic_weathers:', topicWeatherError);
+      return NextResponse.json({ error: 'Failed to fetch topic' }, { status: 500 });
     }
+
+    // ランダムに1件選択
+    // TODO: 直接topic_weathersから取得するように変更
+    const topicWeather = topicWeathers[Math.floor(Math.random() * topicWeathers.length)];
 
     // 対応するお題を取得
     const { data: topic, error: topicError } = await supabase

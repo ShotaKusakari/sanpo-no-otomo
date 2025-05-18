@@ -1,9 +1,15 @@
 "use client";
 import { Box, Button, Container, Paper, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function TopicDisplayPage() {
   const router = useRouter();
+  const [topicTitle, setTopicTitle] = useState<string>('');
+
+  useEffect(() => {
+    setTopicTitle(sessionStorage.getItem('topicTitle') || 'お題が取得できませんでした');
+  }, []);
 
   return (
     <Container maxWidth="sm" sx={{ mt: 4 }}>
@@ -53,7 +59,7 @@ export default function TopicDisplayPage() {
               color: '#495057'
             }}
           >
-            公園のベンチを3つ見つけよう！
+            {topicTitle}
           </Typography>
         </Box>
 
@@ -64,6 +70,26 @@ export default function TopicDisplayPage() {
           justifyContent: 'center',
           mt: 4
         }}>
+          <Button
+            variant="contained"
+            sx={{
+              borderRadius: 8,
+              px: { xs: 4, sm: 6 },
+              py: { xs: 1, sm: 1.5 },
+              fontSize: {
+                xs: '0.9rem',
+                sm: '1rem',
+                md: '1.1rem'
+              },
+              background: 'linear-gradient(45deg, #4CAF50 30%, #81C784 90%)',
+              '&:hover': {
+                background: 'linear-gradient(45deg, #388E3C 30%, #66BB6A 90%)',
+              }
+            }}
+            onClick={() => router.push('/topic_generation')}
+          >
+            完了！
+          </Button>
           <Button
             variant="outlined"
             sx={{
@@ -85,26 +111,6 @@ export default function TopicDisplayPage() {
             onClick={() => router.push('/topic_generation')}
           >
             スキップ
-          </Button>
-          <Button
-            variant="contained"
-            sx={{
-              borderRadius: 8,
-              px: { xs: 4, sm: 6 },
-              py: { xs: 1, sm: 1.5 },
-              fontSize: {
-                xs: '0.9rem',
-                sm: '1rem',
-                md: '1.1rem'
-              },
-              background: 'linear-gradient(45deg, #4CAF50 30%, #81C784 90%)',
-              '&:hover': {
-                background: 'linear-gradient(45deg, #388E3C 30%, #66BB6A 90%)',
-              }
-            }}
-            onClick={() => router.push('/topic_generation')}
-          >
-            完了！
           </Button>
         </Box>
       </Paper>
