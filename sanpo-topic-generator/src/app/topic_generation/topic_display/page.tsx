@@ -8,7 +8,7 @@ export default function TopicDisplayPage() {
   const [topicTitle, setTopicTitle] = useState<string>('');
 
   useEffect(() => {
-    setTopicTitle(sessionStorage.getItem('topicTitle') || '');
+    setTopicTitle(sessionStorage.getItem('topicTitle') || 'お題が取得できませんでした');
   }, []);
 
   return (
