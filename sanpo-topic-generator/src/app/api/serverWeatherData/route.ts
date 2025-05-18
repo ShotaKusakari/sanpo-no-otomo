@@ -4,7 +4,7 @@ import { Database } from '@/../database.types';
 
 type Weather = Database['public']['Tables']['weather_types']['Row'];
 
-export async function fetchWeatherData(): Promise<NextResponse> {
+export async function GET() {
   try {
     const { data, error } = await supabase
       .from('weather_types')
@@ -21,10 +21,7 @@ export async function fetchWeatherData(): Promise<NextResponse> {
       });
     }
 
-    return NextResponse.json({
-      data: data as Weather[],
-      status: 200
-    });
+    return NextResponse.json(data as Weather[]);
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
     if (process.env.NODE_ENV !== 'production') {

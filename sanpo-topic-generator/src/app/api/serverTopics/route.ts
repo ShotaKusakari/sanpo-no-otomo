@@ -4,8 +4,11 @@ import { Database } from '@/../database.types';
 
 type Topic = Database['public']['Tables']['topics']['Row'];
 
-export async function fetchTopicData(weatherId: string): Promise<NextResponse> {
+export async function GET(request: Request) {
   try {
+    const { searchParams } = new URL(request.url);
+    const weatherId = searchParams.get('weatherId');
+
     if (!weatherId) {
       return NextResponse.json(
         { error: 'weatherId is required' },
@@ -27,7 +30,6 @@ export async function fetchTopicData(weatherId: string): Promise<NextResponse> {
 
     // ランダムに1件選択
     const topicWeather = topicWeathers[Math.floor(Math.random() * topicWeathers.length)];
-    console.log('topicWeather.topic_id:', topicWeather.topic_id);
 
     // 対応するお題を取得
     const { data: topic, error: topicError } = await supabase
@@ -44,9 +46,7 @@ export async function fetchTopicData(weatherId: string): Promise<NextResponse> {
       );
     }
 
-    console.log('Fetched topic:', topic);
-
-    return NextResponse.json(topic as Topic, { status: 200 });
+    return NextResponse.json(topic as Topic);
   } catch (error) {
     console.error('Unexpected error:', error);
     return NextResponse.json(

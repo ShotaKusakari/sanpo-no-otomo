@@ -4,7 +4,6 @@ import { JSX } from 'react';
 import WbSunnyIcon from '@mui/icons-material/WbSunny';
 import CloudIcon from '@mui/icons-material/Cloud';
 import UmbrellaIcon from '@mui/icons-material/Umbrella';
-import { fetchWeatherData } from '@/app/api/WeatherData/weatherDatas';
 import { Database } from '@/../database.types';
 
 type Weather = Database['public']['Tables']['weather_types']['Row'];
@@ -28,10 +27,9 @@ export default function WeatherSelector({ selectedWeatherId, onWeatherSelect }: 
   const [weatherOptions, setWeatherOptions] = useState<Weather[]>([]);
 
   useEffect(() => {
-    console.log("WeatherSelector mounted");
     const requestFetchWeatherData = async () => {
       try {
-        const response = await fetchWeatherData();
+        const response = await fetch('/api/serverWeatherData');
         const jsonData = await response.json();
 
         if (jsonData.error) {
@@ -40,9 +38,7 @@ export default function WeatherSelector({ selectedWeatherId, onWeatherSelect }: 
           return;
         }
 
-        console.log("Weather data fetched:", jsonData);
-
-        setWeatherOptions(jsonData.data);
+        setWeatherOptions(jsonData);
       } catch (error) {
         console.error("Failed to fetch weather data:", error);
         setWeatherOptions([]);
@@ -53,7 +49,6 @@ export default function WeatherSelector({ selectedWeatherId, onWeatherSelect }: 
   }, []);
 
   const handleWeatherSelect = useCallback((weatherId: string) => {
-    console.log("Weather selected:", weatherId);
     onWeatherSelect(weatherId);
   }, [onWeatherSelect]);
 

@@ -3,7 +3,6 @@ import { Box, Button, Container, Paper, Typography, Alert, Snackbar } from "@mui
 import WeatherSelector from "./WeatherSelector";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { fetchTopicData } from "@/app/api/topic/topics";
 
 export default function TopicGenerationPage() {
     const [selectedWeatherId, setSelectedWeather] = useState<string>('');
@@ -21,7 +20,7 @@ export default function TopicGenerationPage() {
         setError(null);
 
         try {
-            const response = await fetchTopicData(selectedWeatherId);
+            const response = await fetch(`/api/serverTopics?weatherId=${selectedWeatherId}`);
             const data = await response.json();
 
             if (data.error) {
